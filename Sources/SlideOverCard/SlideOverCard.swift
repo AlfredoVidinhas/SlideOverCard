@@ -34,7 +34,7 @@ internal struct SlideOverCard<Content: View, Style: ShapeStyle>: View {
     public var body: some View {
         ZStack {
             if model.showCard {
-                Color.black
+                style.dimmingColor
                     .opacity(style.dimmingOpacity)
                     .edgesIgnoringSafeArea(.all)
                     .transition(.opacity)

@@ -15,6 +15,7 @@ public struct SOCStyle<S: ShapeStyle> {
                 innerPadding: CGFloat = 24.0,
                 outerPadding: CGFloat = 6.0,
                 dimmingOpacity: CGFloat = 0.3,
+                dimmingColor: Color = Color.black,
                 style: S = Color(.systemGray6)) {
         let cornerRadius = cornerRadius ?? (UIScreen.main.displayCornerRadius ?? 41.5)-outerPadding/2.0
         
@@ -23,6 +24,7 @@ public struct SOCStyle<S: ShapeStyle> {
                   innerPadding: innerPadding,
                   outerPadding: outerPadding,
                   dimmingOpacity: dimmingOpacity,
+                  dimmingColor: dimmingColor,
                   style: style)
     }
     
@@ -32,12 +34,14 @@ public struct SOCStyle<S: ShapeStyle> {
                 innerPadding: CGFloat = 20.0,
                 outerPadding: CGFloat = 6.0,
                 dimmingOpacity: CGFloat = 0.3,
+                dimmingColor: Color = Color.black,
                 style: S = Color(.systemGray6)) {
         self.cornerRadii = cornerRadii
         self.continuous = continuous
         self.innerPadding = innerPadding
         self.outerPadding = outerPadding
         self.dimmingOpacity = dimmingOpacity
+        self.dimmingColor = dimmingColor
         self.style = style
     }
     
@@ -48,6 +52,8 @@ public struct SOCStyle<S: ShapeStyle> {
     let outerPadding: CGFloat
     
     let dimmingOpacity: CGFloat
+    
+    let dimmingColor: Color
     
     let style: S
 }
