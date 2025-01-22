@@ -51,39 +51,35 @@ internal class SOCManager<Content: View, Style: ShapeStyle>: ObservableObject {
     /// Presents a `SlideOverCard`
     @available(iOSApplicationExtension, unavailable)
     func present() {
-        if let cardController, !self.model.showCard {
-            var topViewController = window?.topViewController()
-            
-            // Fallback
-            if topViewController == nil {
-                let windowScene = UIApplication.shared
-                    .connectedScenes
-                    .filter { $0.activationState == .foregroundActive }
-                    .compactMap { $0 as? UIWindowScene }
-                    .first
-                
-                topViewController = windowScene?
-                    .windows
-                    .filter { $0.isKeyWindow }
-                    .first?
-                    .rootViewController
-            }
-            
-            if let topViewController {
-                topViewController.present(cardController, animated: false) {
-                    self.model.showCard = true
-                }
-            }
+        guard let cardController else { return }
+
+        if cardController.presentingViewController != nil {
+            return
+        }
+
+        guard let keyWindow = UIApplication.shared
+            .connectedScenes
+            .compactMap({ $0 as? UIWindowScene })
+            .flatMap({ $0.windows })
+            .first(where: { $0.isKeyWindow }),
+              let rootVC = keyWindow.rootViewController?.topMostViewController() else {
+            return
+        }
+
+        rootVC.present(cardController, animated: true) {
+            self.model.showCard = true
         }
     }
     
     /// Dismisses a `SlideOverCard`
     @available(iOSApplicationExtension, unavailable)
     func dismiss() {
-        onDismiss?()
-        self.model.showCard = false
-        DispatchQueue.main.asyncAfter(deadline: .now()+0.5) { [weak self] in
-            self?.cardController?.dismiss(animated: false)
+        guard model.showCard else {
+            return
+        }
+        
+        cardController?.dismiss(animated: true) { [weak self] in
+            self?.model.showCard = false
         }
     }
     

@@ -16,9 +16,9 @@ internal struct SlideOverCard<Content: View, Style: ShapeStyle>: View {
     let content: Content
     
     init(model: ObservedObject<SOCModel>,
-                options: SOCOptions = [],
-                style: SOCStyle<Style> = SOCStyle(),
-                content: @escaping () -> Content) {
+         options: SOCOptions = [],
+         style: SOCStyle<Style> = SOCStyle(),
+         content: @escaping () -> Content) {
         self._model = model
         self.options = options
         self.style = style
@@ -45,7 +45,7 @@ internal struct SlideOverCard<Content: View, Style: ShapeStyle>: View {
                         }
                     }
             }
-                
+            
             if model.showCard {
                 Group {
                     if #available(iOS 14.0, *) {
@@ -108,30 +108,35 @@ internal struct SlideOverCard<Content: View, Style: ShapeStyle>: View {
         .gesture(
             options.contains(.disableDrag) ? nil :
                 DragGesture()
-                    .onChanged { value in
-                        viewOffset = value.translation.height
-                    }
-                    .onEnded { value in
-                        if value.predictedEndTranslation.height > 175 && !options.contains(.disableDragToDismiss) {
-                            dismiss()
-                        } else {
-                            withAnimation(.defaultSpring) {
-                                viewOffset = 0
-                            }
+                .onChanged { value in
+                    viewOffset = value.translation.height
+                }
+                .onEnded { value in
+                    if value.predictedEndTranslation.height > 175 && !options.contains(.disableDragToDismiss) {
+                        dismiss()
+                    } else {
+                        withAnimation(.defaultSpring) {
+                            viewOffset = 0
                         }
                     }
+                }
         )
     }
     
     func dismiss() {
         model.showCard = false
-    }
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let keyWindow = windowScene.windows.first(where: { $0.isKeyWindow }) {
+                keyWindow.rootViewController?.dismiss(animated: false)
+            }
+        }    }
 }
 
 extension SlideOverCard where Style == Color {
     internal init(model: ObservedObject<SOCModel>,
-                options: SOCOptions = [],
-                content: @escaping () -> Content) {
+                  options: SOCOptions = [],
+                  content: @escaping () -> Content) {
         self._model = model
         self.options = options
         self.style = SOCStyle()

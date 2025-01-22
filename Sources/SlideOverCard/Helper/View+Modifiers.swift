@@ -9,17 +9,25 @@ import SwiftUI
 
 extension View {
     /// Present a `SlideOverCard` with a boolean binding
-    public func slideOverCard<Content: View, Style: ShapeStyle>(isPresented: Binding<Bool>,
-                                             onDismiss: (() -> Void)? = nil,
-                                             options: SOCOptions = [],
-                                             style: SOCStyle<Style> = SOCStyle(),
-                                             @ViewBuilder content: @escaping () -> Content) -> some View {
-        return self
-            .modifier(SOCModifier(isPresented: isPresented,
-                                  onDismiss: onDismiss,
-                                  options: options,
-                                  style: style,
-                                  content: content))
+    public func slideOverCard<Content: View, Style: ShapeStyle>(
+        isPresented: Binding<Bool>,
+        onDismiss: (() -> Void)? = nil,
+        options: SOCOptions = [],
+        style: SOCStyle<Style> = SOCStyle(),
+        @ViewBuilder content: @escaping () -> Content
+    ) -> some View {
+        Group {
+            if isPresented.wrappedValue {
+                self
+                    .modifier(SOCModifier(isPresented: isPresented,
+                                          onDismiss: onDismiss,
+                                          options: options,
+                                          style: style,
+                                          content: content))
+            } else {
+                self
+            }
+        }
     }
     
     /// Present a `SlideOverCard` with a boolean optional
