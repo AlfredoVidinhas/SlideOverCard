@@ -9,17 +9,17 @@ import SwiftUI
 
 /// A view that displays a card that slides over from the bottom of the screen
 internal struct SlideOverCard<Content: View, Style: ShapeStyle>: View {
-    @ObservedObject var model: SOCModel
+    var isPresented: Binding<Bool>
     
     var options: SOCOptions
     let style: SOCStyle<Style>
     let content: Content
     
-    init(model: ObservedObject<SOCModel>,
+    init(isPresented: Binding<Bool>,
          options: SOCOptions = [],
          style: SOCStyle<Style> = SOCStyle(),
          content: @escaping () -> Content) {
-        self._model = model
+        self.isPresented = isPresented
         self.options = options
         self.style = style
         self.content = content()
@@ -33,7 +33,7 @@ internal struct SlideOverCard<Content: View, Style: ShapeStyle>: View {
     
     public var body: some View {
         ZStack {
-            if model.showCard {
+            if isPresented.wrappedValue {
                 style.dimmingColor
                     .opacity(style.dimmingOpacity)
                     .edgesIgnoringSafeArea(.all)
@@ -44,9 +44,7 @@ internal struct SlideOverCard<Content: View, Style: ShapeStyle>: View {
                             dismiss()
                         }
                     }
-            }
-            
-            if model.showCard {
+                
                 Group {
                     if #available(iOS 14.0, *) {
                         container
@@ -63,7 +61,7 @@ internal struct SlideOverCard<Content: View, Style: ShapeStyle>: View {
                 }
             }
         }
-        .animation(.defaultSpring, value: model.showCard)
+        .animation(.defaultSpring, value: isPresented.wrappedValue)
     }
     
     private var container: some View {
@@ -124,22 +122,12 @@ internal struct SlideOverCard<Content: View, Style: ShapeStyle>: View {
     }
     
     func dismiss() {
-        model.showCard = false
+        isPresented.wrappedValue = false
         DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
             if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
                let keyWindow = windowScene.windows.first(where: { $0.isKeyWindow }) {
                 keyWindow.rootViewController?.dismiss(animated: false)
             }
-        }    }
-}
-
-extension SlideOverCard where Style == Color {
-    internal init(model: ObservedObject<SOCModel>,
-                  options: SOCOptions = [],
-                  content: @escaping () -> Content) {
-        self._model = model
-        self.options = options
-        self.style = SOCStyle()
-        self.content = content()
+        }
     }
 }

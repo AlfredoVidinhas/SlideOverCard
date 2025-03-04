@@ -1,60 +1,55 @@
-//
-//  SOCModifier.swift
-//  
-//
-//  Created by João Gabriel Pozzobon dos Santos on 18/03/24.
-//
-
 import SwiftUI
 import Combine
 
-/// A view modifier that presents a `SlideOverCard` over a `View`'s hierarchy through a `SOCManager` based on a `Binding` value
 internal struct SOCModifier<ViewContent: View, Style: ShapeStyle>: ViewModifier {
-    var model: SOCModel
     @Binding var isPresented: Bool
     
-    private let manager: SOCManager<ViewContent, Style>
-    
-    @Environment(\.colorScheme) var colorScheme
+    private var cardController: UIHostingController<SlideOverCard<ViewContent, Style>>?
     
     init(isPresented: Binding<Bool>,
-                onDismiss: (() -> Void)? = nil,
-                options: SOCOptions,
-                style: SOCStyle<Style>,
-                @ViewBuilder content: @escaping () -> ViewContent) {
-        let model = SOCModel()
-        self.model = model
+         options: SOCOptions,
+         style: SOCStyle<Style>,
+         @ViewBuilder content: @escaping () -> ViewContent) {
         self._isPresented = isPresented
         
-        self.manager = .init(model: model,
-                             onDismiss: onDismiss,
-                             options: options,
-                             style: style,
-                             content: content)
+        let rootCard = SlideOverCard(isPresented: isPresented, options: options, style: style, content: content)
+        cardController = UIHostingController(rootView: rootCard)
+        cardController?.view.backgroundColor = .clear
+        cardController?.modalPresentationStyle = .overFullScreen
     }
     
     func body(content: Content) -> some View {
         content
-            .onReceive(Just(colorScheme)) { value in
-                manager.set(colorScheme: value)
+            .onChange(of: isPresented) { oldValue, newValue in
+                newValue ? present() : dismiss()
             }
-            .onReceive(model.$showCard.receive(on: RunLoop.main)) { value in
-                isPresented = value
-            }
-            .onReceive(Just(isPresented)) { value in
-                if value {
-                    manager.present()
-                } else {
-                    manager.dismiss()
-                }
-            }
-            .background(windowAccessor)
     }
     
-    var windowAccessor: some View {
-        WindowAccessor { window in
-            manager.set(window: window)
+    private func present() {
+        guard let cardController else { return }
+        
+        if cardController.presentingViewController != nil {
+            return
         }
-        .allowsHitTesting(false)
+        
+        guard let keyWindow = UIApplication.shared
+            .connectedScenes
+            .compactMap({ $0 as? UIWindowScene })
+            .flatMap({ $0.windows })
+            .first(where: { $0.isKeyWindow }),
+        let rootVC = keyWindow.rootViewController?.topMostViewController() else {
+            return
+        }
+        
+        rootVC.present(cardController, animated: true)
+    }
+    
+    private func dismiss() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+            if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+               let keyWindow = windowScene.windows.first(where: { $0.isKeyWindow }) {
+                keyWindow.rootViewController?.dismiss(animated: false)
+            }
+        }
     }
 }
