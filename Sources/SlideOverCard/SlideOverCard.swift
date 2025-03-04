@@ -46,13 +46,8 @@ internal struct SlideOverCard<Content: View, Style: ShapeStyle>: View {
                     }
                 
                 Group {
-                    if #available(iOS 14.0, *) {
-                        container
-                            .ignoresSafeArea(.container, edges: .bottom)
-                    } else {
-                        container
-                            .edgesIgnoringSafeArea(.bottom)
-                    }
+                    container
+                        .ignoresSafeArea(.container, edges: .bottom)
                 }
                 .transition(isiPad ? .opacity.combined(with: .offset(x: 0, y: 200)) : .move(edge: .bottom))
                 .zIndex(2)

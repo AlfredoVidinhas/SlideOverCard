@@ -19,18 +19,10 @@ internal struct SOCModifier<ViewContent: View, Style: ShapeStyle>: ViewModifier 
     }
     
     func body(content: Content) -> some View {
-        if #available(iOS 14.0, *) {
-            content
-                .onChange(of: isPresented) { oldValue, newValue in
-                    newValue ? present() : dismiss()
-                }
-        } else {
-            content
-                .onChange(of: isPresented) { newValue in
-                    newValue ? present() : dismiss()
-                }
-        }
-        
+        content
+            .onChange(of: isPresented) { oldValue, newValue in
+                newValue ? present() : dismiss()
+            }
     }
     
     private func present() {
@@ -45,7 +37,7 @@ internal struct SOCModifier<ViewContent: View, Style: ShapeStyle>: ViewModifier 
             .compactMap({ $0 as? UIWindowScene })
             .flatMap({ $0.windows })
             .first(where: { $0.isKeyWindow }),
-              let rootVC = keyWindow.rootViewController?.topMostViewController() else {
+        let rootVC = keyWindow.rootViewController?.topMostViewController() else {
             return
         }
         
