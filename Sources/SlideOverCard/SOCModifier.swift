@@ -19,7 +19,7 @@ internal struct SOCModifier<ViewContent: View, Style: ShapeStyle>: ViewModifier 
     }
     
     func body(content: Content) -> some View {
-        if #available(iOS 17.0, *) {
+        if #available(iOS 14.0, *) {
             content
                 .onChange(of: isPresented) { oldValue, newValue in
                     newValue ? present() : dismiss()
