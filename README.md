@@ -3,7 +3,7 @@
 </h1>
 
 <p>
-    <img src="https://img.shields.io/badge/iOS-13.0+-blue.svg" />
+    <img src="https://img.shields.io/badge/iOS-17.0+-blue.svg" />
     <img src="https://img.shields.io/badge/-SwiftUI-red.svg" />
     <a href="https://twitter.com/joogps">
         <img src="https://img.shields.io/badge/Contact-@joogps-lightgrey.svg?style=social&logo=twitter" alt="Twitter: @joogps" />
@@ -23,11 +23,7 @@ A SwiftUI card design similar to the one used by Apple in HomeKit, AirPods, Appl
 > _From left to right: SlideOverCard being used in [Clear Spaces](https://apps.apple.com/us/app/clear-spaces/id1532666619), a QR code scanner prompt (made with [CodeScanner](https://github.com/twostraws/CodeScanner)) and a sample demo app_
 
 ## Installation
-This repository is a Swift package, so just include it in your Xcode project and target under **File > Add package dependencies**. Then, `import SlideOverCard` to the Swift files where you'll be using it.
-
-> [!NOTE]  
-> If your app runs on iOS 13, you might find a problem with keyboard responsiveness in your layout. That's caused by a SwiftUI limitation, unfortunately, since the [`ignoresSafeArea`](https://developer.apple.com/documentation/swiftui/text/ignoressafearea(_:edges:)) modifier was only introduced for the SwiftUI framework in the iOS 14 update.
-> 
+This repository is a Swift package, so just include it in your Xcode project and target under **File > Add package dependencies**. Then, `import SlideOverCard` to the Swift files where you'll be using it. 
 
 ## Usage
 Adding a card to your app is insanely easy. Just add a `.slideOverCard()` modifier anywhere in your view hierarchy, similarly to a `.sheet()`:
@@ -83,21 +79,6 @@ And that's it! It just works. In this case, `$isPresented` is a boolean binding.
       print("I was dismissed.")
   }) {
       // Here goes your amazing layout
-  }
-  ```
-  
-  Alternatively, you can add the card using a binding to an optional identifiable object. That will automatically animate the card between screen changes.
-  ```swift
-  // This uses a binding to an optional object in a switch statement
-  .slideOverCard(item: $activeCard) { item in
-      switch item {
-          case .welcomeView:
-              WelcomeView()
-          case .loginView:
-              LoginView()
-          default:
-              ..........
-      }
   }
   ```
 </details>
